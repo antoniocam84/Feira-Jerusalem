@@ -1,55 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-<title>Feira de Ciências e Tecnologia</title>
+<meta charset="UTF-8">
+<title>Feira de Robótica - Colégio Evangélico Jerusalem</title>
+
 <style>
 body {
-    font-family: Arial;
-    background-color: #0A1F44;
-    color: white;
-    margin: 0;
+  font-family: Arial;
+  margin: 0;
+  background: #dbeeff;
 }
 
+/* CABEÇALHO */
 header {
-    background-color: #123A7A;
-    padding: 15px;
-    text-align: center;
+  background: #f4c542;
+  padding: 15px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-.menu {
-    margin-top: 10px;
-}
-
-.menu a {
-    color: #1E88E5;
-    margin: 10px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
+/* CONTAINER */
 .container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  padding: 20px;
 }
 
+/* CARDS */
 .card {
-    background: #123A7A;
-    padding: 20px;
-    margin: 15px;
-    border-radius: 10px;
-    width: 250px;
-    box-shadow: 0 0 10px #000;
-    text-align: center;
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* DASHBOARD */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
 }
 
 .valor {
-    font-size: 28px;
-    color: #00E676;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2196f3;
 }
 
+/* CRONOGRAMA */
+.etapa {
+  padding: 10px;
+  border-left: 5px solid #2196f3;
+  margin: 8px 0;
+  border-radius: 5px;
+}
+
+.ativa {
+  border-left: 5px solid #f4c542;
+  background: #fff7cc;
+}
+
+/* STATUS */
 .status {
-    color: #FF5252;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.ativo {
+  color: green;
+}
+
+.inativo {
+  color: red;
+}
+
+/* BOTÃO */
+button {
+  padding: 10px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -57,48 +89,115 @@ header {
 <body>
 
 <header>
-    <h1>Feira de Ciências e Tecnologia</h1>
-    <h2>Colégio Evangélico Jerusalem</h2>
-
-    <div class="menu">
-        <a href="#">Início</a>
-        <a href="#">Sensores</a>
-        <a href="#">Robótica</a>
-        <a href="#">Aplicações</a>
-    </div>
+🤖 Feira de Robótica - Colégio Evangélico Jerusalem
 </header>
 
 <div class="container">
 
-    <div class="card">
-        <h2>📏 Distância</h2>
-        <p class="valor">35 cm</p>
-    </div>
+<!-- DASHBOARD -->
+<div class="card">
+<h2>📊 Sensores em Tempo Real</h2>
 
-    <div class="card">
-        <h2>🌡️ Temperatura</h2>
-        <p class="valor">26°C</p>
-    </div>
+<div class="dashboard">
+  <div>
+    🌡️ Temperatura
+    <div class="valor" id="temp">--</div>
+  </div>
 
-    <div class="card">
-        <h2>💧 Umidade</h2>
-        <p class="valor">68%</p>
-    </div>
+  <div>
+    💧 Umidade
+    <div class="valor" id="umidade">--</div>
+  </div>
 
-    <div class="card">
-        <h2>🤖 Robô</h2>
-        <p>Velocidade: <span class="valor">0,8 m/s</span></p>
-        <p class="status">Em movimento</p>
-    </div>
+  <div>
+    📏 Distância
+    <div class="valor" id="distancia">--</div>
+  </div>
+</div>
+</div>
 
-    <div class="card">
-        <h2>📺 OLED</h2>
-        <p>Temp: 26°C</p>
-        <p>Umid: 68%</p>
-        <p>Dist: 35 cm</p>
-    </div>
+<!-- OLED -->
+<div class="card">
+<h2>📺 Display OLED</h2>
+<div id="oled">Aguardando dados...</div>
+</div>
+
+<!-- ROBÔ -->
+<div class="card">
+<h2>🤖 Robô Seguidor de Linha</h2>
+<div class="status" id="roboStatus">INATIVO</div>
+</div>
+
+<!-- CRONOGRAMA -->
+<div class="card">
+<h2>📅 Cronograma da Apresentação</h2>
+
+<div id="cronograma">
+  <div class="etapa ativa">Recepção</div>
+  <div class="etapa">Importância da Robótica</div>
+  <div class="etapa">Projetos</div>
+  <div class="etapa">Dashboard</div>
+  <div class="etapa">Robô em funcionamento</div>
+  <div class="etapa">Encerramento</div>
+</div>
+</div>
+
+<!-- CONTROLE -->
+<div class="card">
+<h2>🎮 Controle</h2>
+<button onclick="iniciarRobo()">Iniciar Robô</button>
+<button onclick="pararRobo()">Parar Robô</button>
+</div>
 
 </div>
+
+<script>
+
+/* DADOS EM TEMPO REAL */
+function atualizarSensores() {
+  let temp = (20 + Math.random()*10).toFixed(1);
+  let umidade = (40 + Math.random()*40).toFixed(1);
+  let distancia = (5 + Math.random()*100).toFixed(0);
+
+  document.getElementById("temp").innerText = temp + " °C";
+  document.getElementById("umidade").innerText = umidade + " %";
+  document.getElementById("distancia").innerText = distancia + " cm";
+
+  document.getElementById("oled").innerText =
+    "Temp: " + temp + "°C | Umid: " + umidade + "%";
+}
+
+setInterval(atualizarSensores, 2000);
+
+/* ROBÔ */
+function iniciarRobo() {
+  let status = document.getElementById("roboStatus");
+  status.innerText = "EM FUNCIONAMENTO";
+  status.className = "status ativo";
+}
+
+function pararRobo() {
+  let status = document.getElementById("roboStatus");
+  status.innerText = "PARADO";
+  status.className = "status inativo";
+}
+
+/* CRONOGRAMA AUTOMÁTICO */
+let etapaAtual = 0;
+const etapas = document.querySelectorAll(".etapa");
+
+function rodarCronograma() {
+  etapas.forEach(e => e.classList.remove("ativa"));
+
+  etapas[etapaAtual].classList.add("ativa");
+
+  etapaAtual++;
+  if (etapaAtual >= etapas.length) etapaAtual = 0;
+}
+
+setInterval(rodarCronograma, 5000);
+
+</script>
 
 </body>
 </html>
