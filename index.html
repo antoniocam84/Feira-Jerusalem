@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Inteligente - Robótica</title>
+<title>Dashboard Robótica e Sensores</title>
 
 <style>
 body {
@@ -29,16 +29,11 @@ h1 {
     margin: 15px;
     width: 280px;
     box-shadow: 0 0 15px rgba(0,255,255,0.2);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .valor {
-    font-size: 36px;
-    margin: 10px 0;
+    font-size: 38px;
+    margin: 10px;
 }
 
 .barra {
@@ -57,20 +52,20 @@ h1 {
 .oled {
     background: black;
     color: #00ffcc;
-    padding: 10px;
     font-family: monospace;
-    border-radius: 8px;
-    margin-top: 10px;
+    padding: 15px;
+    border-radius: 10px;
     text-align: left;
+    margin-top: 10px;
 }
 
 button {
+    padding: 10px;
     margin-top: 20px;
-    padding: 10px 20px;
     border: none;
-    border-radius: 8px;
     background: #22c55e;
     color: white;
+    border-radius: 8px;
     cursor: pointer;
 }
 </style>
@@ -78,14 +73,14 @@ button {
 
 <body>
 
-<h1>🤖 Dashboard de Robótica e Sensores</h1>
+<h1>🤖 Dashboard Inteligente - Robótica e Sensores</h1>
 
 <div class="container">
 
 <!-- DISTÂNCIA -->
 <div class="card">
 <h2>📏 Distância</h2>
-<div class="valor" id="distancia"></div>
+<div id="distancia" class="valor"></div>
 <div class="barra"><div id="barraDist" class="progresso"></div></div>
 <div id="statusDist"></div>
 </div>
@@ -93,7 +88,7 @@ button {
 <!-- TEMPERATURA -->
 <div class="card">
 <h2>🌡️ Temperatura</h2>
-<div class="valor" id="temp"></div>
+<div id="temp" class="valor"></div>
 <div class="barra"><div id="barraTemp" class="progresso"></div></div>
 <div id="statusTemp"></div>
 </div>
@@ -101,93 +96,79 @@ button {
 <!-- UMIDADE -->
 <div class="card">
 <h2>💧 Umidade</h2>
-<div class="valor" id="umidade"></div>
+<div id="umidade" class="valor"></div>
 <div class="barra"><div id="barraUmidade" class="progresso"></div></div>
 <div id="statusUmidade"></div>
 </div>
 
 <!-- ROBÔ -->
 <div class="card">
-<h2>🤖 Robô Seguidor de Linha</h2>
-<div class="valor" id="estadoRobo"></div>
-<div id="velocidade"></div>
-<div class="barra"><div id="barraVel" class="progresso"></div></div>
-<div id="sensoresLinha"></div>
+<h2>🤖 Robô Seguidor</h2>
+<div class="valor" id="velocidade"></div>
+<div id="direcao"></div>
+<div id="linha"></div>
 </div>
 
 <!-- OLED -->
 <div class="card">
-<h2>📟 Display OLED</h2>
-<div class="oled" id="oled">
-Iniciando...
-</div>
+<h2>📺 Display OLED</h2>
+<div class="oled" id="oled"></div>
 </div>
 
 </div>
 
-<button onclick="simularObstaculo()">🚨 Simular obstáculo</button>
+<button onclick="simularErro()">🚨 Simular erro no robô</button>
 
 <script>
-function atualizarDados(obstaculo=false){
+function atualizar(){
 
-    let distancia = obstaculo ? 10 : (Math.random()*100);
-    let temp = 20 + Math.random()*15;
-    let umidade = 40 + Math.random()*50;
+    let dist = (Math.random()*100).toFixed(1);
+    let temp = (20 + Math.random()*15).toFixed(1);
+    let umi = (40 + Math.random()*50).toFixed(1);
 
-    let velocidade = (Math.random()*100).toFixed(0);
+    document.getElementById("distancia").innerText = dist + " cm";
+    document.getElementById("temp").innerText = temp + " °C";
+    document.getElementById("umidade").innerText = umi + " %";
 
-    // Sensores de linha (0 = branco / 1 = preto)
-    let s1 = Math.round(Math.random());
-    let s2 = Math.round(Math.random());
-    let s3 = Math.round(Math.random());
+    document.getElementById("barraDist").style.width = dist + "%";
+    document.getElementById("barraTemp").style.width = (temp*2) + "%";
+    document.getElementById("barraUmidade").style.width = umi + "%";
 
-    // Estado do robô
-    let estado = "Andando";
-    if(obstaculo) estado = "Parado (obstáculo)";
-    else if(s2==1) estado = "Seguindo linha";
-    else if(s1==1) estado = "Virando esquerda";
-    else if(s3==1) estado = "Virando direita";
-
-    // Atualizar tela
-    document.getElementById("distancia").innerText = distancia.toFixed(1)+" cm";
-    document.getElementById("temp").innerText = temp.toFixed(1)+" °C";
-    document.getElementById("umidade").innerText = umidade.toFixed(1)+" %";
-
-    document.getElementById("barraDist").style.width = distancia+"%";
-    document.getElementById("barraTemp").style.width = (temp*2)+"%";
-    document.getElementById("barraUmidade").style.width = umidade+"%";
-
-    document.getElementById("estadoRobo").innerText = estado;
-    document.getElementById("velocidade").innerText = "Velocidade: "+velocidade+"%";
-    document.getElementById("barraVel").style.width = velocidade+"%";
-
-    document.getElementById("sensoresLinha").innerText =
-        "Sensores: ["+s1+" "+s2+" "+s3+"]";
-
-    // OLED
-    document.getElementById("oled").innerText =
-        "Dist: "+distancia.toFixed(1)+"cm\n"+
-        "Temp: "+temp.toFixed(1)+"C\n"+
-        "Umid: "+umidade.toFixed(1)+"%\n"+
-        "Robo: "+estado;
-
-    // Status
     document.getElementById("statusDist").innerText =
-        distancia < 20 ? "⚠️ Objeto próximo!" : "Livre";
+        dist < 20 ? "⚠️ Obstáculo próximo" : "Caminho livre";
 
     document.getElementById("statusTemp").innerText =
         temp < 25 ? "Frio" : temp < 30 ? "Ideal" : "Quente";
 
     document.getElementById("statusUmidade").innerText =
-        umidade < 50 ? "Seco" : umidade < 70 ? "OK" : "Úmido";
+        umi < 50 ? "Seco" : umi < 70 ? "Confortável" : "Úmido";
+
+    // ROBÔ
+    let direcoes = ["➡️ Reto", "↩️ Esquerda", "↪️ Direita"];
+    let dir = direcoes[Math.floor(Math.random()*3)];
+    let vel = (Math.random()*100).toFixed(0);
+
+    document.getElementById("velocidade").innerText = vel + "% potência";
+    document.getElementById("direcao").innerText = "Direção: " + dir;
+    document.getElementById("linha").innerText =
+        dir === "➡️ Reto" ? "Linha central detectada" :
+        "Ajustando trajetória";
+
+    // OLED
+    document.getElementById("oled").innerHTML =
+        "DIST: " + dist + " cm<br>" +
+        "TEMP: " + temp + " C<br>" +
+        "UMI: " + umi + " %<br>" +
+        "DIR: " + dir;
 }
 
-function simularObstaculo(){
-    atualizarDados(true);
+function simularErro(){
+    document.getElementById("oled").innerHTML =
+        "ERRO SENSOR!<br>Verificar conexao";
 }
 
-setInterval(atualizarDados,2000);
-atualizarDados();
+setInterval(atualizar,2000);
+atualizar();
 </script>
 
 </body>
