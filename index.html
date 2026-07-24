@@ -2,12 +2,12 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Inteligente - Sensores</title>
+<title>Dashboard Robótica e Sensores</title>
 
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(135deg, #0f172a, #020617);
+    background: linear-gradient(135deg, #020617, #0f172a);
     color: white;
     text-align: center;
 }
@@ -29,46 +29,43 @@ h1 {
     margin: 15px;
     width: 280px;
     box-shadow: 0 0 15px rgba(0,255,255,0.2);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .valor {
-    font-size: 42px;
-    margin: 10px 0;
+    font-size: 38px;
+    margin: 10px;
 }
 
 .barra {
     width: 100%;
-    height: 15px;
+    height: 12px;
     background: #334155;
     border-radius: 10px;
-    overflow: hidden;
 }
 
 .progresso {
     height: 100%;
     background: #22c55e;
-    width: 50%;
-    transition: 0.5s;
+    border-radius: 10px;
 }
 
-.info {
-    font-size: 14px;
+.oled {
+    background: black;
+    color: #00ffcc;
+    font-family: monospace;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
     margin-top: 10px;
-    color: #cbd5f5;
 }
 
 button {
+    padding: 10px;
     margin-top: 20px;
-    padding: 10px 20px;
     border: none;
-    border-radius: 8px;
     background: #22c55e;
     color: white;
+    border-radius: 8px;
     cursor: pointer;
 }
 </style>
@@ -76,98 +73,102 @@ button {
 
 <body>
 
-<h1>🌐 Dashboard Interativo de Sensores</h1>
+<h1>🤖 Dashboard Inteligente - Robótica e Sensores</h1>
 
 <div class="container">
 
+<!-- DISTÂNCIA -->
 <div class="card">
 <h2>📏 Distância</h2>
-<div class="valor" id="distancia"></div>
+<div id="distancia" class="valor"></div>
 <div class="barra"><div id="barraDist" class="progresso"></div></div>
-<div class="info">Sensor ultrassônico mede distância usando ondas sonoras</div>
 <div id="statusDist"></div>
 </div>
 
+<!-- TEMPERATURA -->
 <div class="card">
 <h2>🌡️ Temperatura</h2>
-<div class="valor" id="temp"></div>
+<div id="temp" class="valor"></div>
 <div class="barra"><div id="barraTemp" class="progresso"></div></div>
-<div class="info">Sensor detecta variação térmica do ambiente</div>
 <div id="statusTemp"></div>
 </div>
 
+<!-- UMIDADE -->
 <div class="card">
 <h2>💧 Umidade</h2>
-<div class="valor" id="umidade"></div>
+<div id="umidade" class="valor"></div>
 <div class="barra"><div id="barraUmidade" class="progresso"></div></div>
-<div class="info">Mede quantidade de vapor de água no ar</div>
 <div id="statusUmidade"></div>
 </div>
 
+<!-- ROBÔ -->
+<div class="card">
+<h2>🤖 Robô Seguidor</h2>
+<div class="valor" id="velocidade"></div>
+<div id="direcao"></div>
+<div id="linha"></div>
 </div>
 
-<button onclick="simularProximo()">🚨 Simular objeto próximo</button>
+<!-- OLED -->
+<div class="card">
+<h2>📺 Display OLED</h2>
+<div class="oled" id="oled"></div>
+</div>
 
-<canvas id="grafico" width="600" height="200"></canvas>
+</div>
+
+<button onclick="simularErro()">🚨 Simular erro no robô</button>
 
 <script>
-let historico = [];
+function atualizar(){
 
-function atualizarDados(simulado=false) {
+    let dist = (Math.random()*100).toFixed(1);
+    let temp = (20 + Math.random()*15).toFixed(1);
+    let umi = (40 + Math.random()*50).toFixed(1);
 
-    let distancia = simulado ? 10 : (Math.random()*100);
-    let temp = 20 + Math.random()*15;
-    let umidade = 40 + Math.random()*50;
-
-    distancia = distancia.toFixed(1);
-    temp = temp.toFixed(1);
-    umidade = umidade.toFixed(1);
-
-    document.getElementById("distancia").innerText = distancia + " cm";
+    document.getElementById("distancia").innerText = dist + " cm";
     document.getElementById("temp").innerText = temp + " °C";
-    document.getElementById("umidade").innerText = umidade + " %";
+    document.getElementById("umidade").innerText = umi + " %";
 
-    document.getElementById("barraDist").style.width = distancia + "%";
+    document.getElementById("barraDist").style.width = dist + "%";
     document.getElementById("barraTemp").style.width = (temp*2) + "%";
-    document.getElementById("barraUmidade").style.width = umidade + "%";
+    document.getElementById("barraUmidade").style.width = umi + "%";
 
     document.getElementById("statusDist").innerText =
-        distancia < 20 ? "⚠️ Objeto muito próximo!" : "Distância segura";
+        dist < 20 ? "⚠️ Obstáculo próximo" : "Caminho livre";
 
     document.getElementById("statusTemp").innerText =
         temp < 25 ? "Frio" : temp < 30 ? "Ideal" : "Quente";
 
     document.getElementById("statusUmidade").innerText =
-        umidade < 50 ? "Seco" : umidade < 70 ? "Confortável" : "Úmido";
+        umi < 50 ? "Seco" : umi < 70 ? "Confortável" : "Úmido";
 
-    historico.push(distancia);
-    if(historico.length > 20) historico.shift();
+    // ROBÔ
+    let direcoes = ["➡️ Reto", "↩️ Esquerda", "↪️ Direita"];
+    let dir = direcoes[Math.floor(Math.random()*3)];
+    let vel = (Math.random()*100).toFixed(0);
 
-    desenharGrafico();
+    document.getElementById("velocidade").innerText = vel + "% potência";
+    document.getElementById("direcao").innerText = "Direção: " + dir;
+    document.getElementById("linha").innerText =
+        dir === "➡️ Reto" ? "Linha central detectada" :
+        "Ajustando trajetória";
+
+    // OLED
+    document.getElementById("oled").innerHTML =
+        "DIST: " + dist + " cm<br>" +
+        "TEMP: " + temp + " C<br>" +
+        "UMI: " + umi + " %<br>" +
+        "DIR: " + dir;
 }
 
-function desenharGrafico(){
-    let canvas = document.getElementById("grafico");
-    let ctx = canvas.getContext("2d");
-
-    ctx.clearRect(0,0,600,200);
-
-    ctx.beginPath();
-    for(let i=0;i<historico.length;i++){
-        let x = i*30;
-        let y = 200 - historico[i]*2;
-        if(i==0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
+function simularErro(){
+    document.getElementById("oled").innerHTML =
+        "ERRO SENSOR!<br>Verificar conexao";
 }
 
-function simularProximo(){
-    atualizarDados(true);
-}
-
-setInterval(atualizarDados,2000);
-atualizarDados();
+setInterval(atualizar,2000);
+atualizar();
 </script>
 
 </body>
