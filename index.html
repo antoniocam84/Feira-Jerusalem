@@ -1,175 +1,102 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Dashboard Robótica e Sensores</title>
-
+<title>Feira de Ciências e Tecnologia</title>
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(135deg, #020617, #0f172a);
+    background-color: #0A1F44;
     color: white;
+    margin: 0;
+}
+
+header {
+    background-color: #123A7A;
+    padding: 15px;
     text-align: center;
 }
 
-h1 {
-    margin-top: 20px;
+.menu {
+    margin-top: 10px;
+}
+
+.menu a {
+    color: #1E88E5;
+    margin: 10px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .container {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .card {
-    background: #1e293b;
-    border-radius: 15px;
+    background: #123A7A;
     padding: 20px;
     margin: 15px;
-    width: 280px;
-    box-shadow: 0 0 15px rgba(0,255,255,0.2);
+    border-radius: 10px;
+    width: 250px;
+    box-shadow: 0 0 10px #000;
+    text-align: center;
 }
 
 .valor {
-    font-size: 38px;
-    margin: 10px;
+    font-size: 28px;
+    color: #00E676;
 }
 
-.barra {
-    width: 100%;
-    height: 12px;
-    background: #334155;
-    border-radius: 10px;
-}
-
-.progresso {
-    height: 100%;
-    background: #22c55e;
-    border-radius: 10px;
-}
-
-.oled {
-    background: black;
-    color: #00ffcc;
-    font-family: monospace;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: left;
-    margin-top: 10px;
-}
-
-button {
-    padding: 10px;
-    margin-top: 20px;
-    border: none;
-    background: #22c55e;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
+.status {
+    color: #FF5252;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🤖 Dashboard Inteligente - Robótica e Sensores</h1>
+<header>
+    <h1>Feira de Ciências e Tecnologia</h1>
+    <div class="menu">
+        <a href="#">Início</a>
+        <a href="#">Sensores</a>
+        <a href="#">Robótica</a>
+        <a href="#">Aplicações</a>
+    </div>
+</header>
 
 <div class="container">
 
-<!-- DISTÂNCIA -->
-<div class="card">
-<h2>📏 Distância</h2>
-<div id="distancia" class="valor"></div>
-<div class="barra"><div id="barraDist" class="progresso"></div></div>
-<div id="statusDist"></div>
-</div>
+    <div class="card">
+        <h2>📏 Distância</h2>
+        <p class="valor">35 cm</p>
+    </div>
 
-<!-- TEMPERATURA -->
-<div class="card">
-<h2>🌡️ Temperatura</h2>
-<div id="temp" class="valor"></div>
-<div class="barra"><div id="barraTemp" class="progresso"></div></div>
-<div id="statusTemp"></div>
-</div>
+    <div class="card">
+        <h2>🌡️ Temperatura</h2>
+        <p class="valor">26°C</p>
+    </div>
 
-<!-- UMIDADE -->
-<div class="card">
-<h2>💧 Umidade</h2>
-<div id="umidade" class="valor"></div>
-<div class="barra"><div id="barraUmidade" class="progresso"></div></div>
-<div id="statusUmidade"></div>
-</div>
+    <div class="card">
+        <h2>💧 Umidade</h2>
+        <p class="valor">68%</p>
+    </div>
 
-<!-- ROBÔ -->
-<div class="card">
-<h2>🤖 Robô Seguidor</h2>
-<div class="valor" id="velocidade"></div>
-<div id="direcao"></div>
-<div id="linha"></div>
-</div>
+    <div class="card">
+        <h2>🤖 Robô</h2>
+        <p>Velocidade: <span class="valor">0,8 m/s</span></p>
+        <p class="status">Em movimento</p>
+    </div>
 
-<!-- OLED -->
-<div class="card">
-<h2>📺 Display OLED</h2>
-<div class="oled" id="oled"></div>
-</div>
+    <div class="card">
+        <h2>📺 OLED</h2>
+        <p>Temp: 26°C</p>
+        <p>Umid: 68%</p>
+        <p>Dist: 35 cm</p>
+    </div>
 
 </div>
-
-<button onclick="simularErro()">🚨 Simular erro no robô</button>
-
-<script>
-function atualizar(){
-
-    let dist = (Math.random()*100).toFixed(1);
-    let temp = (20 + Math.random()*15).toFixed(1);
-    let umi = (40 + Math.random()*50).toFixed(1);
-
-    document.getElementById("distancia").innerText = dist + " cm";
-    document.getElementById("temp").innerText = temp + " °C";
-    document.getElementById("umidade").innerText = umi + " %";
-
-    document.getElementById("barraDist").style.width = dist + "%";
-    document.getElementById("barraTemp").style.width = (temp*2) + "%";
-    document.getElementById("barraUmidade").style.width = umi + "%";
-
-    document.getElementById("statusDist").innerText =
-        dist < 20 ? "⚠️ Obstáculo próximo" : "Caminho livre";
-
-    document.getElementById("statusTemp").innerText =
-        temp < 25 ? "Frio" : temp < 30 ? "Ideal" : "Quente";
-
-    document.getElementById("statusUmidade").innerText =
-        umi < 50 ? "Seco" : umi < 70 ? "Confortável" : "Úmido";
-
-    // ROBÔ
-    let direcoes = ["➡️ Reto", "↩️ Esquerda", "↪️ Direita"];
-    let dir = direcoes[Math.floor(Math.random()*3)];
-    let vel = (Math.random()*100).toFixed(0);
-
-    document.getElementById("velocidade").innerText = vel + "% potência";
-    document.getElementById("direcao").innerText = "Direção: " + dir;
-    document.getElementById("linha").innerText =
-        dir === "➡️ Reto" ? "Linha central detectada" :
-        "Ajustando trajetória";
-
-    // OLED
-    document.getElementById("oled").innerHTML =
-        "DIST: " + dist + " cm<br>" +
-        "TEMP: " + temp + " C<br>" +
-        "UMI: " + umi + " %<br>" +
-        "DIR: " + dir;
-}
-
-function simularErro(){
-    document.getElementById("oled").innerHTML =
-        "ERRO SENSOR!<br>Verificar conexao";
-}
-
-setInterval(atualizar,2000);
-atualizar();
-</script>
 
 </body>
 </html>
