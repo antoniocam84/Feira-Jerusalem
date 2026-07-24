@@ -2,12 +2,12 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Inteligente - Sensores</title>
+<title>Dashboard Inteligente - Robótica</title>
 
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(135deg, #0f172a, #020617);
+    background: linear-gradient(135deg, #020617, #0f172a);
     color: white;
     text-align: center;
 }
@@ -37,29 +37,31 @@ h1 {
 }
 
 .valor {
-    font-size: 42px;
+    font-size: 36px;
     margin: 10px 0;
 }
 
 .barra {
     width: 100%;
-    height: 15px;
+    height: 12px;
     background: #334155;
     border-radius: 10px;
-    overflow: hidden;
 }
 
 .progresso {
     height: 100%;
     background: #22c55e;
-    width: 50%;
-    transition: 0.5s;
+    border-radius: 10px;
 }
 
-.info {
-    font-size: 14px;
+.oled {
+    background: black;
+    color: #00ffcc;
+    padding: 10px;
+    font-family: monospace;
+    border-radius: 8px;
     margin-top: 10px;
-    color: #cbd5f5;
+    text-align: left;
 }
 
 button {
@@ -76,93 +78,111 @@ button {
 
 <body>
 
-<h1>🌐 Dashboard Interativo de Sensores</h1>
+<h1>🤖 Dashboard de Robótica e Sensores</h1>
 
 <div class="container">
 
+<!-- DISTÂNCIA -->
 <div class="card">
 <h2>📏 Distância</h2>
 <div class="valor" id="distancia"></div>
 <div class="barra"><div id="barraDist" class="progresso"></div></div>
-<div class="info">Sensor ultrassônico mede distância usando ondas sonoras</div>
 <div id="statusDist"></div>
 </div>
 
+<!-- TEMPERATURA -->
 <div class="card">
 <h2>🌡️ Temperatura</h2>
 <div class="valor" id="temp"></div>
 <div class="barra"><div id="barraTemp" class="progresso"></div></div>
-<div class="info">Sensor detecta variação térmica do ambiente</div>
 <div id="statusTemp"></div>
 </div>
 
+<!-- UMIDADE -->
 <div class="card">
 <h2>💧 Umidade</h2>
 <div class="valor" id="umidade"></div>
 <div class="barra"><div id="barraUmidade" class="progresso"></div></div>
-<div class="info">Mede quantidade de vapor de água no ar</div>
 <div id="statusUmidade"></div>
 </div>
 
+<!-- ROBÔ -->
+<div class="card">
+<h2>🤖 Robô Seguidor de Linha</h2>
+<div class="valor" id="estadoRobo"></div>
+<div id="velocidade"></div>
+<div class="barra"><div id="barraVel" class="progresso"></div></div>
+<div id="sensoresLinha"></div>
 </div>
 
-<button onclick="simularProximo()">🚨 Simular objeto próximo</button>
+<!-- OLED -->
+<div class="card">
+<h2>📟 Display OLED</h2>
+<div class="oled" id="oled">
+Iniciando...
+</div>
+</div>
 
-<canvas id="grafico" width="600" height="200"></canvas>
+</div>
+
+<button onclick="simularObstaculo()">🚨 Simular obstáculo</button>
 
 <script>
-let historico = [];
+function atualizarDados(obstaculo=false){
 
-function atualizarDados(simulado=false) {
-
-    let distancia = simulado ? 10 : (Math.random()*100);
+    let distancia = obstaculo ? 10 : (Math.random()*100);
     let temp = 20 + Math.random()*15;
     let umidade = 40 + Math.random()*50;
 
-    distancia = distancia.toFixed(1);
-    temp = temp.toFixed(1);
-    umidade = umidade.toFixed(1);
+    let velocidade = (Math.random()*100).toFixed(0);
 
-    document.getElementById("distancia").innerText = distancia + " cm";
-    document.getElementById("temp").innerText = temp + " °C";
-    document.getElementById("umidade").innerText = umidade + " %";
+    // Sensores de linha (0 = branco / 1 = preto)
+    let s1 = Math.round(Math.random());
+    let s2 = Math.round(Math.random());
+    let s3 = Math.round(Math.random());
 
-    document.getElementById("barraDist").style.width = distancia + "%";
-    document.getElementById("barraTemp").style.width = (temp*2) + "%";
-    document.getElementById("barraUmidade").style.width = umidade + "%";
+    // Estado do robô
+    let estado = "Andando";
+    if(obstaculo) estado = "Parado (obstáculo)";
+    else if(s2==1) estado = "Seguindo linha";
+    else if(s1==1) estado = "Virando esquerda";
+    else if(s3==1) estado = "Virando direita";
 
+    // Atualizar tela
+    document.getElementById("distancia").innerText = distancia.toFixed(1)+" cm";
+    document.getElementById("temp").innerText = temp.toFixed(1)+" °C";
+    document.getElementById("umidade").innerText = umidade.toFixed(1)+" %";
+
+    document.getElementById("barraDist").style.width = distancia+"%";
+    document.getElementById("barraTemp").style.width = (temp*2)+"%";
+    document.getElementById("barraUmidade").style.width = umidade+"%";
+
+    document.getElementById("estadoRobo").innerText = estado;
+    document.getElementById("velocidade").innerText = "Velocidade: "+velocidade+"%";
+    document.getElementById("barraVel").style.width = velocidade+"%";
+
+    document.getElementById("sensoresLinha").innerText =
+        "Sensores: ["+s1+" "+s2+" "+s3+"]";
+
+    // OLED
+    document.getElementById("oled").innerText =
+        "Dist: "+distancia.toFixed(1)+"cm\n"+
+        "Temp: "+temp.toFixed(1)+"C\n"+
+        "Umid: "+umidade.toFixed(1)+"%\n"+
+        "Robo: "+estado;
+
+    // Status
     document.getElementById("statusDist").innerText =
-        distancia < 20 ? "⚠️ Objeto muito próximo!" : "Distância segura";
+        distancia < 20 ? "⚠️ Objeto próximo!" : "Livre";
 
     document.getElementById("statusTemp").innerText =
         temp < 25 ? "Frio" : temp < 30 ? "Ideal" : "Quente";
 
     document.getElementById("statusUmidade").innerText =
-        umidade < 50 ? "Seco" : umidade < 70 ? "Confortável" : "Úmido";
-
-    historico.push(distancia);
-    if(historico.length > 20) historico.shift();
-
-    desenharGrafico();
+        umidade < 50 ? "Seco" : umidade < 70 ? "OK" : "Úmido";
 }
 
-function desenharGrafico(){
-    let canvas = document.getElementById("grafico");
-    let ctx = canvas.getContext("2d");
-
-    ctx.clearRect(0,0,600,200);
-
-    ctx.beginPath();
-    for(let i=0;i<historico.length;i++){
-        let x = i*30;
-        let y = 200 - historico[i]*2;
-        if(i==0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-}
-
-function simularProximo(){
+function simularObstaculo(){
     atualizarDados(true);
 }
 
