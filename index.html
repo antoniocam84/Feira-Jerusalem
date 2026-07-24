@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - Sensores</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.card {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px;
+    width: 250px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.valor {
+    font-size: 40px;
+    margin: 10px 0;
+}
+
+.status {
+    font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌐 Feira de Ciências - Dashboard de Sensores</h1>
+
+<div class="container">
+
+    <div class="card">
+        <h2>📏 Distância</h2>
+        <div class="valor" id="distancia">-- cm</div>
+        <div class="status" id="statusDist"></div>
+    </div>
+
+    <div class="card">
+        <h2>🌡️ Temperatura</h2>
+        <div class="valor" id="temp">-- °C</div>
+        <div class="status" id="statusTemp"></div>
+    </div>
+
+    <div class="card">
+        <h2>💧 Umidade</h2>
+        <div class="valor" id="umidade">-- %</div>
+        <div class="status" id="statusUmidade"></div>
+    </div>
+
+</div>
+
+<script>
+function atualizarDados() {
+
+    // Dados simulados
+    let distancia = (Math.random() * 100).toFixed(1);
+    let temperatura = (20 + Math.random() * 15).toFixed(1);
+    let umidade = (40 + Math.random() * 50).toFixed(1);
+
+    document.getElementById("distancia").innerText = distancia + " cm";
+    document.getElementById("temp").innerText = temperatura + " °C";
+    document.getElementById("umidade").innerText = umidade + " %";
+
+    // Status inteligente
+    document.getElementById("statusDist").innerText =
+        distancia < 20 ? "⚠️ Objeto próximo" : "✅ Distância segura";
+
+    document.getElementById("statusTemp").innerText =
+        temperatura < 25 ? "Frio" :
+        temperatura < 30 ? "Ideal" : "Quente";
+
+    document.getElementById("statusUmidade").innerText =
+        umidade < 50 ? "Seco" :
+        umidade < 70 ? "Confortável" : "Úmido";
+}
+
+// Atualiza a cada 2 segundos
+setInterval(atualizarDados, 2000);
+atualizarDados();
+</script>
+
+</body>
+</html>
