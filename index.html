@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Feira de Robótica</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #dbeeff;
+}
+
+/* CABEÇALHO */
+header {
+  background: #f4c542;
+  padding: 20px;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* GRID */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* CARDS */
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+/* TÍTULOS */
+h2 {
+  margin-top: 0;
+}
+
+/* VALORES */
+.valor {
+  font-size: 30px;
+  font-weight: bold;
+  color: #2196f3;
+}
+
+/* CRONOGRAMA */
+.etapa {
+  padding: 10px;
+  border-left: 5px solid #2196f3;
+  margin: 8px 0;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.etapa.ativa {
+  border-left: 5px solid #f4c542;
+  background: #fff7cc;
+  transform: scale(1.02);
+}
+
+/* ROBÔ */
+.status {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ativo { color: green; }
+.inativo { color: red; }
+
+/* BOTÕES */
+button {
+  padding: 10px;
+  margin: 5px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🤖 Colégio Evangélico Jerusalem - Feira de Robótica
+</header>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<div class="card">
+<h2>📊 Sensores</h2>
+
+<p>🌡️ Temperatura</p>
+<div class="valor" id="temp">--</div>
+
+<p>💧 Umidade</p>
+<div class="valor" id="umidade">--</div>
+
+<p>📏 Distância</p>
+<div class="valor" id="distancia">--</div>
+</div>
+
+<!-- OLED -->
+<div class="card">
+<h2>📺 OLED</h2>
+<div id="oled">Aguardando dados...</div>
+</div>
+
+<!-- ROBÔ -->
+<div class="card">
+<h2>🤖 Robô Seguidor de Linha</h2>
+
+<div id="robo" class="status inativo">PARADO</div>
+
+<button onclick="ligarRobo()">Ligar</button>
+<button onclick="desligarRobo()">Desligar</button>
+</div>
+
+<!-- CRONOGRAMA -->
+<div class="card">
+<h2>📅 Apresentação</h2>
+
+<div id="etapas">
+  <div class="etapa ativa">Recepção</div>
+  <div class="etapa">Importância da Robótica</div>
+  <div class="etapa">Projetos</div>
+  <div class="etapa">Dashboard</div>
+  <div class="etapa">Robô em funcionamento</div>
+  <div class="etapa">Encerramento</div>
+</div>
+</div>
+
+</div>
+
+<script>
+
+/* SENSORES */
+function atualizar() {
+  let t = (20 + Math.random()*10).toFixed(1);
+  let u = (40 + Math.random()*40).toFixed(1);
+  let d = (10 + Math.random()*90).toFixed(0);
+
+  document.getElementById("temp").innerText = t + " °C";
+  document.getElementById("umidade").innerText = u + " %";
+  document.getElementById("distancia").innerText = d + " cm";
+
+  document.getElementById("oled").innerText =
+    "Temp: " + t + "°C | Umid: " + u + "%";
+}
+
+setInterval(atualizar, 2000);
+
+/* ROBÔ */
+function ligarRobo() {
+  let r = document.getElementById("robo");
+  r.innerText = "EM FUNCIONAMENTO";
+  r.className = "status ativo";
+}
+
+function desligarRobo() {
+  let r = document.getElementById("robo");
+  r.innerText = "PARADO";
+  r.className = "status inativo";
+}
+
+/* CRONOGRAMA */
+let atual = 0;
+const etapas = document.querySelectorAll(".etapa");
+
+function mudarEtapa() {
+  etapas.forEach(e => e.classList.remove("ativa"));
+
+  etapas[atual].classList.add("ativa");
+
+  atual++;
+  if (atual >= etapas.length) atual = 0;
+}
+
+setInterval(mudarEtapa, 5000);
+
+</script>
+
+</body>
+</html>
