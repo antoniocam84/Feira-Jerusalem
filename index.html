@@ -2,189 +2,172 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Feira de Robótica</title>
+<title>Dashboard Inteligente - Sensores</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial;
-  background: #dbeeff;
+    font-family: Arial;
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: white;
+    text-align: center;
 }
 
-/* CABEÇALHO */
-header {
-  background: #f4c542;
-  padding: 20px;
-  text-align: center;
-  font-size: 26px;
-  font-weight: bold;
+h1 {
+    margin-top: 20px;
 }
 
-/* GRID */
 .container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* CARDS */
 .card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px;
+    width: 280px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.2);
+    transition: 0.3s;
 }
 
-/* TÍTULOS */
-h2 {
-  margin-top: 0;
+.card:hover {
+    transform: scale(1.05);
 }
 
-/* VALORES */
 .valor {
-  font-size: 30px;
-  font-weight: bold;
-  color: #2196f3;
+    font-size: 42px;
+    margin: 10px 0;
 }
 
-/* CRONOGRAMA */
-.etapa {
-  padding: 10px;
-  border-left: 5px solid #2196f3;
-  margin: 8px 0;
-  border-radius: 5px;
-  transition: 0.3s;
+.barra {
+    width: 100%;
+    height: 15px;
+    background: #334155;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.etapa.ativa {
-  border-left: 5px solid #f4c542;
-  background: #fff7cc;
-  transform: scale(1.02);
+.progresso {
+    height: 100%;
+    background: #22c55e;
+    width: 50%;
+    transition: 0.5s;
 }
 
-/* ROBÔ */
-.status {
-  font-size: 20px;
-  font-weight: bold;
+.info {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #cbd5f5;
 }
 
-.ativo { color: green; }
-.inativo { color: red; }
-
-/* BOTÕES */
 button {
-  padding: 10px;
-  margin: 5px;
-  background: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #22c55e;
+    color: white;
+    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-🤖 Colégio Evangélico Jerusalem - Feira de Robótica
-</header>
+<h1>🌐 Dashboard Interativo de Sensores</h1>
 
 <div class="container">
 
-<!-- DASHBOARD -->
 <div class="card">
-<h2>📊 Sensores</h2>
-
-<p>🌡️ Temperatura</p>
-<div class="valor" id="temp">--</div>
-
-<p>💧 Umidade</p>
-<div class="valor" id="umidade">--</div>
-
-<p>📏 Distância</p>
-<div class="valor" id="distancia">--</div>
+<h2>📏 Distância</h2>
+<div class="valor" id="distancia"></div>
+<div class="barra"><div id="barraDist" class="progresso"></div></div>
+<div class="info">Sensor ultrassônico mede distância usando ondas sonoras</div>
+<div id="statusDist"></div>
 </div>
 
-<!-- OLED -->
 <div class="card">
-<h2>📺 OLED</h2>
-<div id="oled">Aguardando dados...</div>
+<h2>🌡️ Temperatura</h2>
+<div class="valor" id="temp"></div>
+<div class="barra"><div id="barraTemp" class="progresso"></div></div>
+<div class="info">Sensor detecta variação térmica do ambiente</div>
+<div id="statusTemp"></div>
 </div>
 
-<!-- ROBÔ -->
 <div class="card">
-<h2>🤖 Robô Seguidor de Linha</h2>
-
-<div id="robo" class="status inativo">PARADO</div>
-
-<button onclick="ligarRobo()">Ligar</button>
-<button onclick="desligarRobo()">Desligar</button>
-</div>
-
-<!-- CRONOGRAMA -->
-<div class="card">
-<h2>📅 Apresentação</h2>
-
-<div id="etapas">
-  <div class="etapa ativa">Recepção</div>
-  <div class="etapa">Importância da Robótica</div>
-  <div class="etapa">Projetos</div>
-  <div class="etapa">Dashboard</div>
-  <div class="etapa">Robô em funcionamento</div>
-  <div class="etapa">Encerramento</div>
-</div>
+<h2>💧 Umidade</h2>
+<div class="valor" id="umidade"></div>
+<div class="barra"><div id="barraUmidade" class="progresso"></div></div>
+<div class="info">Mede quantidade de vapor de água no ar</div>
+<div id="statusUmidade"></div>
 </div>
 
 </div>
+
+<button onclick="simularProximo()">🚨 Simular objeto próximo</button>
+
+<canvas id="grafico" width="600" height="200"></canvas>
 
 <script>
+let historico = [];
 
-/* SENSORES */
-function atualizar() {
-  let t = (20 + Math.random()*10).toFixed(1);
-  let u = (40 + Math.random()*40).toFixed(1);
-  let d = (10 + Math.random()*90).toFixed(0);
+function atualizarDados(simulado=false) {
 
-  document.getElementById("temp").innerText = t + " °C";
-  document.getElementById("umidade").innerText = u + " %";
-  document.getElementById("distancia").innerText = d + " cm";
+    let distancia = simulado ? 10 : (Math.random()*100);
+    let temp = 20 + Math.random()*15;
+    let umidade = 40 + Math.random()*50;
 
-  document.getElementById("oled").innerText =
-    "Temp: " + t + "°C | Umid: " + u + "%";
+    distancia = distancia.toFixed(1);
+    temp = temp.toFixed(1);
+    umidade = umidade.toFixed(1);
+
+    document.getElementById("distancia").innerText = distancia + " cm";
+    document.getElementById("temp").innerText = temp + " °C";
+    document.getElementById("umidade").innerText = umidade + " %";
+
+    document.getElementById("barraDist").style.width = distancia + "%";
+    document.getElementById("barraTemp").style.width = (temp*2) + "%";
+    document.getElementById("barraUmidade").style.width = umidade + "%";
+
+    document.getElementById("statusDist").innerText =
+        distancia < 20 ? "⚠️ Objeto muito próximo!" : "Distância segura";
+
+    document.getElementById("statusTemp").innerText =
+        temp < 25 ? "Frio" : temp < 30 ? "Ideal" : "Quente";
+
+    document.getElementById("statusUmidade").innerText =
+        umidade < 50 ? "Seco" : umidade < 70 ? "Confortável" : "Úmido";
+
+    historico.push(distancia);
+    if(historico.length > 20) historico.shift();
+
+    desenharGrafico();
 }
 
-setInterval(atualizar, 2000);
+function desenharGrafico(){
+    let canvas = document.getElementById("grafico");
+    let ctx = canvas.getContext("2d");
 
-/* ROBÔ */
-function ligarRobo() {
-  let r = document.getElementById("robo");
-  r.innerText = "EM FUNCIONAMENTO";
-  r.className = "status ativo";
+    ctx.clearRect(0,0,600,200);
+
+    ctx.beginPath();
+    for(let i=0;i<historico.length;i++){
+        let x = i*30;
+        let y = 200 - historico[i]*2;
+        if(i==0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
 }
 
-function desligarRobo() {
-  let r = document.getElementById("robo");
-  r.innerText = "PARADO";
-  r.className = "status inativo";
+function simularProximo(){
+    atualizarDados(true);
 }
 
-/* CRONOGRAMA */
-let atual = 0;
-const etapas = document.querySelectorAll(".etapa");
-
-function mudarEtapa() {
-  etapas.forEach(e => e.classList.remove("ativa"));
-
-  etapas[atual].classList.add("ativa");
-
-  atual++;
-  if (atual >= etapas.length) atual = 0;
-}
-
-setInterval(mudarEtapa, 5000);
-
+setInterval(atualizarDados,2000);
+atualizarDados();
 </script>
 
 </body>
